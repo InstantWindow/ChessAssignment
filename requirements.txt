@@ -1,0 +1,4 @@
+transformers
+minicons
+chess
+torch
