@@ -16,7 +16,6 @@ class TransformerPlayer(Player):
         super().__init__(name)
         self.hfId = scorer.IncrementalLMScorer(hfId, device=device)
         self.depth = depth # depth checks how far the model goes for thinking ahead
-        self.chosen_opening = None
 
     def prompting(self, fen, move):
         # this funciton gives the correct notation so that the model can correctly asses what needs to be played
@@ -77,21 +76,23 @@ class TransformerPlayer(Player):
 
             return best
     
-    def openings(self, board):
+ 
+    def get_opening(self, board):
         openings = {
           'italian':  ['e2e4', 'g1f3', 'f1c4', 'c2c3'],
           'sicilian': ['e2e4', 'g1f3', 'd2d4', 'b1c3'],
           'french':   ['e2e4', 'd2d4', 'b1c3', 'g1f3'],
                     } 
-        if board.fullmove_number == 1 or not hasattr(self.get_opening, 'chosen'):
-          self.get_opening.chosen = openings[random.choice(list(openings.keys()))]
+        if board.fullmove_number == 1 or not hasattr(self, '_chosen_opening'):
+          self.chosen_opening = openings[random.choice(list(openings.keys()))]
 
     # Reset after move 4 for next game
         if board.fullmove_number == 4:
-          self.get_opening.chosen = openings[random.choice(list(openings.keys()))]
+          self.chosen_opening = openings[random.choice(list(openings.keys()))]
 
         move_index = board.fullmove_number - 1
-        return self.get_opening.chosen[move_index]
+        return self.chosen_opening[move_index]
+    
     
 
     def get_move(self, fen):
@@ -101,12 +102,12 @@ class TransformerPlayer(Player):
         if not legalMoves:
             return None
 
-
         if board.turn == chess.WHITE and board.fullmove_number <= 4:
             opening_move = self.get_opening(board)  # called only for moves 1-4
             move = chess.Move.from_uci(opening_move)
             if move in legalMoves:
                 return opening_move
+
 
         bestScore = -9999
         best_move = None
