@@ -83,10 +83,10 @@ class TransformerPlayer(Player):
           'sicilian': ['e2e4', 'g1f3', 'd2d4', 'b1c3'],
           'french':   ['e2e4', 'd2d4', 'b1c3', 'g1f3'],
                     } 
-        if board.fullmove_number == 1 or not hasattr(self, '_chosen_opening'):
+        if board.fullmove_number == 1 or not hasattr(self, 'chosen_opening'):
           self.chosen_opening = openings[random.choice(list(openings.keys()))]
 
-    # Reset after move 4 for next game
+        # Reset after move 4 for next game
         if board.fullmove_number == 4:
           self.chosen_opening = openings[random.choice(list(openings.keys()))]
 
